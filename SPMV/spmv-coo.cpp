@@ -2,6 +2,7 @@
 using namespace std;  
 #include <cstdbool>
 #include <cstdlib>
+#include <omp.h>
 
 typedef struct Sparse_Coordinate {
     int n_rows;
@@ -124,6 +125,9 @@ int matrix_vector_sparse_coordinate(
     const double* vec,
     double* res
 ) {
+    //omp_get_thread_num();
+    #pragma omp parallel num_threads(2)
+    {
     for (int i=0; i<A_coo->n_cols; ++i) {
         res[i] = 0.0;
     }
@@ -134,6 +138,7 @@ int matrix_vector_sparse_coordinate(
         double value = A_coo->values[nnz_id];
 
         res[row_id] += value * vec[col_id];
+    }
     }
 
     return EXIT_SUCCESS;

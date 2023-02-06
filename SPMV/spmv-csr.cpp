@@ -2,6 +2,7 @@
 using namespace std;  
 #include <cstdbool>
 #include <cstdlib>
+#include <omp.h>
 
 typedef struct Sparse_CSR {
     int n_rows;
@@ -124,6 +125,8 @@ int matrix_vector_sparse_csr(
     const double* vec,
     double* res
 ) {
+    #pragma omp parallel num_threads(2)
+    {
     for (int i=0; i<A_csr->n_rows; ++i) {
         res[i] = 0.0;
         int nz_start = A_csr->row_ptrs[i];
@@ -133,6 +136,7 @@ int matrix_vector_sparse_csr(
             double val = A_csr->values[nz_id];
             res[i] = res[i] + val * vec[j];
         }
+    }
     }
     return EXIT_SUCCESS;
 }
